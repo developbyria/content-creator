@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Jeorella — Hero Preview</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --color-bg: #FFFFFF;
+    --color-cream: #FFFFFF;
+    --color-accent: #A0634E;
+    --color-accent-dark: #6E3E2C;
+    --color-secondary: #F3D8C7;
+    --color-text: #2A1A12;
+    --color-text-muted: #7A5244;
+    --color-pill-border: rgba(160,99,78,0.16);
+
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    /* the hero section locks itself to one screen via .hero-fullscreen below,
+       but the page as a whole must stay scrollable so sections after it (like About) are reachable */
+  }
+
+  body {
+    font-family: var(--font-body);
+    color: var(--color-text);
+    background-color: var(--color-bg);
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* ============================================================
+     HERO WRAPPER — locked to exactly one screen, on any device.
+     100dvh accounts for mobile browser chrome (address bar etc.);
+     100vh is the fallback for browsers that don't support dvh.
+  ============================================================ */
+  .hero-fullscreen {
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  /* ---------- NAV ---------- */
+  .top-nav {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: clamp(12px, 2vh, 22px) clamp(16px, 4vw, 40px);
+  }
+
+  .nav-logo {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(15px, 2vw, 20px);
+    color: var(--color-accent-dark);
+    letter-spacing: 0.5px;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: clamp(14px, 2vw, 28px);
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    transition: color 0.2s ease;
+  }
+
+  .nav-links a:hover { color: var(--color-accent-dark); }
+
+  @media (max-width: 560px) {
+    .nav-links { display: none; }
+  }
+
+  /* ---------- INTRO ---------- */
+  .hero-intro {
+    flex: 0 0 auto;
+    padding: clamp(4px, 1.5vh, 16px) 16px;
+    text-align: center;
+  }
+
+  .hero-eyebrow {
+    font-size: clamp(9px, 1.2vw, 11px);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: clamp(4px, 1vh, 12px);
+  }
+
+  .hero-name {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(24px, 5vw, 48px);
+    color: var(--color-text);
+    line-height: 1.1;
+    margin-bottom: clamp(4px, 1vh, 12px);
+  }
+
+  .hero-tagline {
+    font-size: clamp(11px, 1.6vw, 14px);
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  @media (max-height: 700px) {
+    .hero-tagline { display: none; }
+  }
+
+  /* ---------- PHOTO GRID — fills all remaining vertical space ---------- */
+  .hero-grid {
+    flex: 1 1 auto;
+    min-height: 0; /* required for flex children to shrink below content size */
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3px;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    margin-bottom: clamp(16px, 3vh, 32px);
+    padding: 0 4px;
+    overflow: hidden;
+  }
+
+  .hero-tile {
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    min-width: 0; /* lets grid columns shrink instead of overflowing on narrow screens */
+    cursor: pointer;
+    background-color: var(--color-secondary); /* fills any letterbox space so contain never looks empty */
+  }
+
+  .hero-tile-photo {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    background-size: cover;        /* fills the whole frame edge-to-edge, cropping as needed */
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: transform 0.5s ease;
+  }
+
+  .hero-tile:hover .hero-tile-photo {
+    transform: scale(1.06);
+  }
+
+  /* ---------- RESPONSIVE GRID — stack vertically on tablet/mobile ---------- */
+  @media (max-width: 900px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: none;      /* let tiles size themselves instead of splitting height into thirds */
+      grid-auto-rows: auto;
+      align-content: start;
+      overflow: visible;             /* page scrolls now, so the grid doesn't need to clip/scroll internally */
+      gap: 0;                        /* spacing now handled by margin-bottom on .hero-tile instead */
+      padding: 0 16px;
+    }
+
+    .hero-tile {
+      aspect-ratio: 1 / 1;           /* keeps each tile a square box, never a tall rectangle */
+      height: auto;
+      align-self: start;
+      border-radius: 18px;           /* rounded card look */
+      margin-bottom: 20px;           /* extra spacing so stacked tiles never touch or overlap */
+    }
+
+    .hero-tile:last-child {
+      margin-bottom: 0;
+    }
+
+    .hero-tile-photo {
+      height: 100%;                  /* fill the square box; background-size: contain (set above) keeps the photo uncropped inside it */
+    }
+  }
+
+  .hero-tile-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: clamp(10px, 2.5vw, 24px);
+    background: linear-gradient(180deg, rgba(30,20,15,0) 45%, rgba(30,20,15,0.78) 100%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+
+  .hero-tile:hover .hero-tile-overlay {
+    opacity: 1;
+  }
+
+  /* On touch devices there's no hover, so keep captions visible always */
+  @media (hover: none) {
+    .hero-tile-overlay { opacity: 1; }
+  }
+
+  .hero-tile-tag {
+    font-size: clamp(8px, 1.4vw, 10px);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--color-secondary);
+    margin-bottom: clamp(3px, 0.8vh, 8px);
+  }
+
+  .hero-tile-caption {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(12px, 2.2vw, 20px);
+    color: #fff;
+    line-height: 1.25;
+  }
+
+  @media (max-width: 560px) {
+    .hero-tile-caption { font-size: 11px; }
+    .hero-tile-tag { font-size: 8px; letter-spacing: 1px; }
+  }
+
+  /* ---------- CTA BUTTONS ---------- */
+  .cta-row {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(10px, 2vw, 16px);
+    padding: clamp(10px, 1.8vh, 20px) 16px;
+  }
+
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(9px, 1.4vh, 13px) clamp(18px, 3vw, 28px);
+    border-radius: 999px;
+    font-size: clamp(10px, 1.4vw, 12px);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  }
+
+  .cta-button-primary {
+    background: var(--color-accent);
+    color: #fff;
+  }
+
+  .cta-button-primary:hover {
+    background: var(--color-accent-dark);
+    transform: translateY(-2px);
+  }
+
+  .cta-button-secondary {
+    background: transparent;
+    color: var(--color-accent-dark);
+    border: 1px solid var(--color-accent);
+  }
+
+  .cta-button-secondary:hover {
+    background: var(--color-secondary);
+    transform: translateY(-2px);
+  }
+
+  /* ============================================================
+     ABOUT SECTION — separate full-height "page" below the hero.
+     Left: photo. Right: her story. Mirrors the hero's palette
+     and type system so it reads as the same site.
+  ============================================================ */
+  .about-section {
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+    background-color: var(--color-cream);
+  }
+
+  .about-photo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    padding: clamp(20px, 4vw, 48px);
+  }
+
+  .about-photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+  }
+
+  .about-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(40px, 8vw, 120px);
+  }
+
+  .about-cta {
+    align-self: flex-start;
+  }
+
+  @media (max-width: 900px) {
+    .about-cta {
+      align-self: center;
+    }
+  }
+
+  .about-eyebrow {
+    font-size: clamp(9px, 1.2vw, 11px);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: clamp(10px, 1.5vw, 18px);
+  }
+
+  .about-heading {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(28px, 4vw, 44px);
+    color: var(--color-text);
+    line-height: 1.15;
+    margin-bottom: clamp(16px, 2.5vw, 28px);
+  }
+
+  .about-text {
+    font-size: clamp(13px, 1.4vw, 16px);
+    line-height: 1.8;
+    color: var(--color-text-muted);
+    max-width: 480px;
+    margin-bottom: clamp(24px, 3vw, 36px);
+  }
+
+  /* ---------- RESPONSIVE — stack photo above text on tablet/mobile ---------- */
+  @media (max-width: 900px) {
+    .about-section {
+      grid-template-columns: 1fr;
+    }
+
+    .about-photo {
+      padding: clamp(20px, 6vw, 40px);
+    }
+
+    .about-content {
+      padding: clamp(32px, 8vw, 56px) 24px;
+      text-align: center;
+      align-items: center;
+    }
+
+    .about-text {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="hero-fullscreen">
+
+    <nav class="top-nav">
+      <div class="nav-logo">nica</div>
+      <ul class="nav-links">
+        <li><a href="#picks">Fashion</a></li>
+        <li><a href="#wardrobe">Wardrobe</a></li>
+        <li><a href="#brands">Brands</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <div class="hero-intro">
+      <div class="hero-eyebrow">Content Creator</div>
+      <div class="hero-name">Nica</div>
+    </div>
+
+    <div class="hero-grid">
+      <div class="hero-tile">
+        <div class="hero-tile-photo" style="background-image: url('https://github.com/developbyria/content-creator/blob/main/images/travelling.png?raw=true');">
+        </div>
+        <div class="hero-tile-overlay" style="justify-content: center; align-items: center; text-align: center;">
+          <div class="hero-tile-tag" style="font-size: clamp(14px, 2vw, 18px);">Travel</div>
+          <div class="hero-tile-caption" style="font-size: clamp(22px, 4vw, 40px);">Travel and Adventure</div>
+        </div>
+      </div>
+
+      <div class="hero-tile">
+        <div class="hero-tile-photo" style="background-image: url('https://github.com/developbyria/content-creator/blob/main/images/model.png?raw=true');">
+        </div>
+        <div class="hero-tile-overlay" style="justify-content: center; align-items: center; text-align: center;">
+          <div class="hero-tile-tag" style="font-size: clamp(14px, 2vw, 18px);">Fashion</div>
+          <div class="hero-tile-caption" style="font-size: clamp(22px, 4vw, 40px);">Fashion and Style</div>
+        </div>
+      </div>
+
+      <div class="hero-tile">
+        <div class="hero-tile-photo" style="background-image: url('https://github.com/developbyria/content-creator/blob/main/images/hiking.png?raw=true');">
+        </div>
+        <div class="hero-tile-overlay" style="justify-content: center; align-items: center; text-align: center;">
+          <div class="hero-tile-tag" style="font-size: clamp(14px, 2vw, 18px);">Wellness</div>
+          <div class="hero-tile-caption" style="font-size: clamp(22px, 4vw, 40px);">Wellness and Lifestyle</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <section class="about-section" id="about">
+    <div class="about-photo">
+      <img src="https://github.com/developbyria/content-creator/blob/main/images/white.png?raw=true" alt="Nica" />
+    </div>
+
+    <div class="about-content">
+      <div class="about-eyebrow">About</div>
+      <h2 class="about-heading">Meet Nica</h2>
+      <p class="about-text">I'm Nica, a lifestyle content creator passionate about travel, wellness, and visual storytelling. I create authentic, engaging content that captures experiences and helps brands connect with their audience in a natural and relatable way.</p>
+      <a href="#brands" class="cta-button cta-button-primary about-cta">Work With Me</a>
+    </div>
+  </section>
+
+</body>
+</html>
